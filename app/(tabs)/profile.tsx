@@ -254,7 +254,7 @@ export default function ProfileScreen() {
                   <MaterialIcons name="content-copy" size={16} color="#7B2FBE" />
                   <Text style={styles.refCodeText}>{user.referralCode}</Text>
                 </Pressable>
-                <Pressable style={styles.refShareBtn}>
+                <Pressable style={styles.refShareBtn} onPress={() => router.push('/referral-levels')}>
                   <MaterialIcons name="share" size={14} color="#fff" />
                   <Text style={styles.refShareText}>مشاركة الكود</Text>
                 </Pressable>

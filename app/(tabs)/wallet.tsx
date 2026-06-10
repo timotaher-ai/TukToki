@@ -148,7 +148,7 @@ export default function WalletScreen() {
           <View style={styles.balanceActions}>
             {[
               { icon: 'add', label: 'شحن',  onPress: () => router.push('/wallet-topup'), primary: true },
-              { icon: 'download', label: 'سحب', onPress: () => showAlert('قريباً', 'خدمة السحب ستكون متاحة قريباً'), primary: false },
+              { icon: 'download', label: 'سحب', onPress: () => router.push('/withdrawal'), primary: false },
               { icon: 'send', label: 'تحويل', onPress: () => showAlert('قريباً', 'خدمة التحويل ستكون متاحة قريباً'), primary: false },
             ].map(btn => (
               <Pressable
@@ -191,7 +191,7 @@ export default function WalletScreen() {
             {/* Quick stats */}
             <View style={styles.quickStats}>
               {[
-                { icon: 'person-add', label: 'إحالات', value: String(user.referralCount), color: Colors.success },
+                { icon: 'person-add', label: 'إحالات', value: String(user.referralCount), color: Colors.success, onPress: () => router.push('/referral-levels') },
                 { icon: 'attach-money', label: 'أرباح الإحالة', value: `${user.referralEarnings} ج`, color: Colors.primary },
                 { icon: 'trending-up', label: 'إجمالي الدخل', value: `${totalEarned.toFixed(0)} ج`, color: Colors.warning },
               ].map(item => (

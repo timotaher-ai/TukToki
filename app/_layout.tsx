@@ -27,6 +27,9 @@ export default function RootLayout() {
             <Stack.Screen name="notifications" />
             <Stack.Screen name="admin-panel" />
             <Stack.Screen name="wallet-topup" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="withdrawal" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="referral-levels" />
+            <Stack.Screen name="stories" />
           </Stack>
         </AppProvider>
       </SafeAreaProvider>

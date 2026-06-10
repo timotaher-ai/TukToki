@@ -1,14 +1,16 @@
-// Powered by OnSpace.AI — Messages Screen (Dark Premium Design)
+// Powered by OnSpace.AI — TukTalk Screen (Dark Premium + حكايات Stories)
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Pressable, TextInput,
+  View, Text, StyleSheet, FlatList, Pressable, TextInput, ScrollView,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@/constants/theme';
 import { mockConversations } from '@/constants/mockData';
+import { StoriesBar } from '../stories';
 import { StatusBar } from 'expo-status-bar';
 
 type FilterTab = 'all' | 'drivers' | 'support';
@@ -42,9 +44,7 @@ export default function MessagesScreen() {
         <Pressable style={styles.headerIconBtn}>
           <MaterialIcons name="more-horiz" size={20} color={Colors.primary} />
         </Pressable>
-
         <Text style={styles.headerTitle}>الرسائل</Text>
-
         <Pressable style={styles.headerIconBtn}>
           <MaterialIcons name="edit-square" size={20} color={Colors.textSecondary} />
         </Pressable>
@@ -63,6 +63,28 @@ export default function MessagesScreen() {
             textAlign="right"
           />
         </View>
+      </View>
+
+      {/* ── حكايات (Stories) Section ────────────────────────── */}
+      <View style={styles.storiesSection}>
+        <View style={styles.storiesHeader}>
+          <Pressable style={styles.storiesAllBtn} onPress={() => router.push('/stories')}>
+            <Text style={styles.storiesAllText}>كل الحكايات</Text>
+            <MaterialIcons name="arrow-back" size={14} color={Colors.primary} />
+          </Pressable>
+          <View style={styles.storiesTitleWrap}>
+            <View style={styles.storiesTitleDot} />
+            <Text style={styles.storiesTitle}>الحكايات</Text>
+          </View>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.storiesScroll}
+        >
+          <StoriesBar />
+        </ScrollView>
       </View>
 
       {/* ── Filter Tabs ─────────────────────────────────────── */}
@@ -114,9 +136,7 @@ export default function MessagesScreen() {
                   transition={200}
                 />
               )}
-              {/* Online dot */}
               {conv.online && <View style={styles.onlineDot} />}
-              {/* Unread badge */}
               {conv.unread > 0 && (
                 <View style={styles.unreadBadge}>
                   <Text style={styles.unreadBadgeText}>{conv.unread}</Text>
@@ -126,15 +146,12 @@ export default function MessagesScreen() {
 
             {/* Content */}
             <View style={styles.convContent}>
-              {/* Name + Time row */}
               <View style={styles.convTopRow}>
                 <Text style={styles.convTime}>{conv.time}</Text>
                 <Text style={[styles.convName, conv.unread > 0 && styles.convNameUnread]}>
                   {conv.name}
                 </Text>
               </View>
-
-              {/* Pinned icon + Last message */}
               <View style={styles.convBottomRow}>
                 <View style={styles.convMsgRow}>
                   {conv.pinned && (
@@ -165,168 +182,99 @@ const styles = StyleSheet.create({
 
   // HEADER
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.base,
-    paddingBottom: Spacing.base,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base, paddingBottom: Spacing.base,
   },
-  headerTitle: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.xl,
-    fontWeight: Typography.black,
-    color: Colors.textPrimary,
-  },
+  headerTitle: { fontFamily: Typography.fontFamily, fontSize: Typography.xl, fontWeight: Typography.black, color: Colors.textPrimary },
   headerIconBtn: {
     width: 40, height: 40, borderRadius: 20,
-    backgroundColor: Colors.surface,
-    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
     borderWidth: 1, borderColor: Colors.border,
   },
 
   // SEARCH
   searchWrap: { paddingHorizontal: Spacing.base, marginBottom: Spacing.base },
   searchBar: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.full,
+    backgroundColor: Colors.surface, borderRadius: Radius.full,
     flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: Spacing.base, paddingVertical: 12,
-    gap: 10,
+    paddingHorizontal: Spacing.base, paddingVertical: 12, gap: 10,
     borderWidth: 1, borderColor: Colors.border,
   },
-  searchInput: {
-    flex: 1,
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.base,
-    color: Colors.textPrimary,
+  searchInput: { flex: 1, fontFamily: Typography.fontFamily, fontSize: Typography.base, color: Colors.textPrimary },
+
+  // STORIES
+  storiesSection: {
+    borderBottomWidth: 1, borderBottomColor: Colors.divider,
+    paddingBottom: Spacing.sm, marginBottom: Spacing.sm,
   },
+  storiesHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base, marginBottom: Spacing.xs,
+  },
+  storiesTitleWrap: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  storiesTitleDot: {
+    width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.primary,
+    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8, shadowRadius: 4,
+  },
+  storiesTitle: { fontFamily: Typography.fontFamily, fontSize: Typography.md, fontWeight: Typography.bold, color: Colors.textPrimary },
+  storiesAllBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: Colors.primarySurface, borderRadius: Radius.full,
+    paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: Colors.borderGold,
+  },
+  storiesAllText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.primary, fontWeight: Typography.semiBold },
+  storiesScroll: {},
 
   // FILTER TABS
   filterRow: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.base,
-    gap: Spacing.sm,
-    marginBottom: Spacing.base,
+    flexDirection: 'row', paddingHorizontal: Spacing.base,
+    gap: Spacing.sm, marginBottom: Spacing.base,
   },
   filterTab: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.full,
-    paddingVertical: 10,
-    borderWidth: 1, borderColor: Colors.border,
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 5, backgroundColor: Colors.surface, borderRadius: Radius.full,
+    paddingVertical: 10, borderWidth: 1, borderColor: Colors.border,
   },
-  filterTabActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-    ...Shadow.goldenSm,
-  },
-  filterTabText: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.xs,
-    fontWeight: Typography.semiBold,
-    color: Colors.textTertiary,
-  },
+  filterTabActive: { backgroundColor: Colors.primary, borderColor: Colors.primary, ...Shadow.goldenSm },
+  filterTabText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, fontWeight: Typography.semiBold, color: Colors.textTertiary },
   filterTabTextActive: { color: Colors.textInverse },
 
   // CONVERSATIONS
   convItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.base,
-    gap: Spacing.md,
+    flexDirection: 'row', alignItems: 'flex-start',
+    paddingHorizontal: Spacing.base, paddingVertical: Spacing.base, gap: Spacing.md,
   },
   convItemBorder: {},
-  separator: {
-    height: 1,
-    backgroundColor: Colors.divider,
-    marginHorizontal: Spacing.base,
-  },
+  separator: { height: 1, backgroundColor: Colors.divider, marginHorizontal: Spacing.base },
   avatarWrap: { position: 'relative', flexShrink: 0 },
-  avatar: {
-    width: 56, height: 56, borderRadius: 28,
-    borderWidth: 2, borderColor: Colors.border,
-  },
+  avatar: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: Colors.border },
   systemAvatar: {
-    width: 56, height: 56, borderRadius: 28,
-    backgroundColor: Colors.surface,
-    borderWidth: 2, borderColor: Colors.borderGold,
-    alignItems: 'center', justifyContent: 'center',
+    width: 56, height: 56, borderRadius: 28, backgroundColor: Colors.surface,
+    borderWidth: 2, borderColor: Colors.borderGold, alignItems: 'center', justifyContent: 'center',
   },
-  systemAvatarText: {
-    fontFamily: Typography.fontFamily,
-    fontSize: 12, fontWeight: Typography.black,
-    color: Colors.primary, lineHeight: 14,
-  },
-  systemAvatarSub: {
-    fontFamily: Typography.fontFamily,
-    fontSize: 9, fontWeight: Typography.bold,
-    color: Colors.primary, lineHeight: 12,
-  },
+  systemAvatarText: { fontFamily: Typography.fontFamily, fontSize: 12, fontWeight: Typography.black, color: Colors.primary, lineHeight: 14 },
+  systemAvatarSub: { fontFamily: Typography.fontFamily, fontSize: 9, fontWeight: Typography.bold, color: Colors.primary, lineHeight: 12 },
   onlineDot: {
     position: 'absolute', bottom: 2, right: 2,
-    width: 13, height: 13, borderRadius: 7,
-    backgroundColor: Colors.success,
+    width: 13, height: 13, borderRadius: 7, backgroundColor: Colors.success,
     borderWidth: 2.5, borderColor: Colors.background,
   },
   unreadBadge: {
     position: 'absolute', top: -2, right: -2,
-    backgroundColor: Colors.primary,
-    borderRadius: 10, minWidth: 20, height: 20,
-    alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 2, borderColor: Colors.background,
-    ...Shadow.goldenSm,
+    backgroundColor: Colors.primary, borderRadius: 10, minWidth: 20, height: 20,
+    alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4,
+    borderWidth: 2, borderColor: Colors.background, ...Shadow.goldenSm,
   },
-  unreadBadgeText: {
-    fontFamily: Typography.fontFamily,
-    fontSize: 10, fontWeight: Typography.black,
-    color: Colors.textInverse,
-  },
+  unreadBadgeText: { fontFamily: Typography.fontFamily, fontSize: 10, fontWeight: Typography.black, color: Colors.textInverse },
   convContent: { flex: 1 },
-  convTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  convName: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.base,
-    fontWeight: Typography.semiBold,
-    color: Colors.textSecondary,
-    textAlign: 'right',
-  },
-  convNameUnread: {
-    fontWeight: Typography.bold,
-    color: Colors.textPrimary,
-  },
-  convTime: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.xs,
-    color: Colors.textTertiary,
-  },
+  convTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
+  convName: { fontFamily: Typography.fontFamily, fontSize: Typography.base, fontWeight: Typography.semiBold, color: Colors.textSecondary, textAlign: 'right' },
+  convNameUnread: { fontWeight: Typography.bold, color: Colors.textPrimary },
+  convTime: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.textTertiary },
   convBottomRow: { gap: 2 },
-  convMsgRow: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  convLastMsg: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.sm,
-    color: Colors.textTertiary,
-    textAlign: 'right',
-    flex: 1,
-  },
+  convMsgRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' },
+  convLastMsg: { fontFamily: Typography.fontFamily, fontSize: Typography.sm, color: Colors.textTertiary, textAlign: 'right', flex: 1 },
   convLastMsgUnread: { color: Colors.textSecondary },
-  convLastMsg2: {
-    fontFamily: Typography.fontFamily,
-    fontSize: Typography.xs,
-    color: Colors.textMuted,
-    textAlign: 'right',
-  },
+  convLastMsg2: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.textMuted, textAlign: 'right' },
 });
