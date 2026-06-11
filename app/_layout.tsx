@@ -30,6 +30,8 @@ export default function RootLayout() {
             <Stack.Screen name="withdrawal" options={{ presentation: 'modal' }} />
             <Stack.Screen name="referral-levels" />
             <Stack.Screen name="stories" />
+            <Stack.Screen name="scheduled-rides" />
+            <Stack.Screen name="tuktalk" />
           </Stack>
         </AppProvider>
       </SafeAreaProvider>

@@ -1,7 +1,7 @@
 // Powered by OnSpace.AI — Home Screen (Dark Premium Redesign)
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Dimensions, Platform,
+  View, Text, StyleSheet, ScrollView, Pressable, Dimensions, Platform, Animated,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,6 +34,51 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user, activeRide, unreadNotifications } = useApp();
   const [selectedCar, setSelectedCar] = useState('standard');
+
+  // ── Upcoming scheduled ride mock (soonest) ──
+  const upcomingRide = {
+    id: 'sr1',
+    from: 'شارع النيل، المعادي',
+    to: 'مطار القاهرة الدولي',
+    targetMs: Date.now() + 92 * 60 * 1000, // 1h 32m from now
+    vehicle: 'ملاكي توفير',
+    vehicleIcon: 'directions-car' as const,
+    price: '140–180',
+    timeLabel: '02:30 ظ',
+    dateLabel: 'اليوم',
+  };
+
+  // Countdown state
+  const [countdown, setCountdown] = useState('');
+  const [isSoon, setIsSoon] = useState(false);
+  useEffect(() => {
+    const tick = () => {
+      const diff = upcomingRide.targetMs - Date.now();
+      if (diff <= 0) { setCountdown('الآن'); setIsSoon(true); return; }
+      const totalSecs = Math.floor(diff / 1000);
+      const h = Math.floor(totalSecs / 3600);
+      const m = Math.floor((totalSecs % 3600) / 60);
+      const s = totalSecs % 60;
+      if (h > 0) setCountdown(`${h}س ${m}د`);
+      else setCountdown(`${m}د ${s}ث`);
+      setIsSoon(h === 0 && m <= 30);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (isSoon) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.02, duration: 800, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+        ])
+      ).start();
+    }
+  }, [isSoon]);
 
   return (
     <View style={styles.root}>
@@ -219,6 +264,61 @@ export default function HomeScreen() {
             })}
           </View>
         </View>
+
+        {/* ── Upcoming Scheduled Ride Card ────────────────────────── */}
+        <Animated.View style={[styles.scheduledCard, isSoon && { borderColor: Colors.warning + '70', transform: [{ scale: pulseAnim }] }]}>
+          <View style={styles.scheduledTop}>
+            <Pressable
+              style={styles.scheduledAllBtn}
+              onPress={() => router.push('/scheduled-rides')}
+            >
+              <Text style={styles.scheduledAllText}>كل الرحلات</Text>
+              <MaterialIcons name="arrow-back" size={13} color={Colors.primary} />
+            </Pressable>
+            <View style={styles.scheduledTopLeft}>
+              <View style={[styles.scheduledCountdownPill, isSoon && { backgroundColor: Colors.warningSurface }]}>
+                <MaterialIcons name="timer" size={12} color={isSoon ? Colors.warning : Colors.textTertiary} />
+                <Text style={[styles.scheduledCountdown, isSoon && { color: Colors.warning }]}>{countdown}</Text>
+              </View>
+              <View style={styles.scheduledLabel}>
+                <View style={[styles.scheduledDot, { backgroundColor: isSoon ? Colors.warning : Colors.success }]} />
+                <Text style={styles.scheduledTitle}>رحلة مجدولة قادمة</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.scheduledRoute}>
+            <View style={styles.scheduledRouteRow}>
+              <View style={[styles.scheduledRouteDot, { backgroundColor: Colors.success }]} />
+              <Text style={styles.scheduledRouteText} numberOfLines={1}>{upcomingRide.from}</Text>
+            </View>
+            <View style={styles.scheduledArrow}>
+              <View style={styles.scheduledLine} />
+              <MaterialIcons name="arrow-downward" size={10} color={Colors.textMuted} />
+            </View>
+            <View style={styles.scheduledRouteRow}>
+              <View style={[styles.scheduledRouteDot, { backgroundColor: Colors.error }]} />
+              <Text style={styles.scheduledRouteText} numberOfLines={1}>{upcomingRide.to}</Text>
+            </View>
+          </View>
+
+          <View style={styles.scheduledFooter}>
+            <Pressable style={styles.scheduledManageBtn} onPress={() => router.push('/scheduled-rides')}>
+              <MaterialIcons name="edit" size={14} color={Colors.primary} />
+              <Text style={styles.scheduledManageText}>إدارة الرحلة</Text>
+            </Pressable>
+            <View style={styles.scheduledMeta}>
+              <View style={styles.scheduledMetaItem}>
+                <MaterialIcons name={upcomingRide.vehicleIcon} size={12} color={Colors.primary} />
+                <Text style={styles.scheduledMetaText}>{upcomingRide.vehicle}</Text>
+              </View>
+              <View style={styles.scheduledMetaItem}>
+                <MaterialIcons name="schedule" size={12} color={Colors.textTertiary} />
+                <Text style={styles.scheduledMetaText}>{upcomingRide.timeLabel} · {upcomingRide.dateLabel}</Text>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
 
         {/* ── Active Ride ───────────────────────────────────────────── */}
         {activeRide ? (
@@ -569,6 +669,48 @@ const styles = StyleSheet.create({
     width: 8, height: 8, borderRadius: 4,
     backgroundColor: Colors.primary,
   },
+
+  // SCHEDULED CARD
+  scheduledCard: {
+    marginHorizontal: Spacing.base, marginTop: Spacing.md,
+    backgroundColor: Colors.surface, borderRadius: Radius.xl,
+    padding: Spacing.base, gap: Spacing.sm,
+    borderWidth: 1.5, borderColor: Colors.borderGold,
+    ...Shadow.golden,
+  },
+  scheduledTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  scheduledTopLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  scheduledLabel: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  scheduledDot: { width: 8, height: 8, borderRadius: 4 },
+  scheduledTitle: { fontFamily: Typography.fontFamily, fontSize: Typography.sm, fontWeight: Typography.bold, color: Colors.textPrimary },
+  scheduledCountdownPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: Colors.primarySurface, borderRadius: Radius.full,
+    paddingHorizontal: 9, paddingVertical: 4, borderWidth: 1, borderColor: Colors.borderGold,
+  },
+  scheduledCountdown: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, fontWeight: Typography.black, color: Colors.primary },
+  scheduledAllBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: Colors.surfaceSecondary, borderRadius: Radius.full,
+    paddingHorizontal: 9, paddingVertical: 4, borderWidth: 1, borderColor: Colors.border,
+  },
+  scheduledAllText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: Typography.semiBold },
+  scheduledRoute: { backgroundColor: Colors.surfaceSecondary, borderRadius: Radius.lg, padding: Spacing.sm, gap: 4 },
+  scheduledRouteRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  scheduledRouteDot: { width: 8, height: 8, borderRadius: 4, flexShrink: 0 },
+  scheduledRouteText: { flex: 1, fontFamily: Typography.fontFamily, fontSize: Typography.xs, fontWeight: Typography.semiBold, color: Colors.textPrimary, textAlign: 'right' },
+  scheduledArrow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, gap: 2 },
+  scheduledLine: { width: 1, height: 8, backgroundColor: Colors.border, marginRight: 3, marginLeft: 11 },
+  scheduledFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  scheduledManageBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: Colors.primarySurface, borderRadius: Radius.full,
+    paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: Colors.borderGold,
+  },
+  scheduledManageText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, fontWeight: Typography.bold, color: Colors.primary },
+  scheduledMeta: { alignItems: 'flex-end', gap: 3 },
+  scheduledMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  scheduledMetaText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.textTertiary },
 
   // ACTIVE RIDE
   activeRideCard: {

@@ -7,6 +7,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@/constants/theme';
 import { mockConversations } from '@/constants/mockData';
@@ -86,6 +87,22 @@ export default function MessagesScreen() {
           <StoriesBar />
         </ScrollView>
       </View>
+
+      {/* ── TukTalk Feed Banner ─────────────────────────────── */}
+      <Pressable style={styles.tuktalkBanner} onPress={() => router.push('/tuktalk')}>
+        <MaterialIcons name="arrow-back" size={18} color={Colors.primary} />
+        <View style={styles.tuktalkBannerInfo}>
+          <Text style={styles.tuktalkBannerTitle}>الساحة الاجتماعية</Text>
+          <Text style={styles.tuktalkBannerSub}>المنشورات · رائج · رحلات موثقة</Text>
+        </View>
+        <LinearGradient
+          colors={[Colors.primary, '#B87418']}
+          style={styles.tuktalkBannerIcon}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+        >
+          <Text style={styles.tuktalkBannerLogo}>TT</Text>
+        </LinearGradient>
+      </Pressable>
 
       {/* ── Filter Tabs ─────────────────────────────────────── */}
       <View style={styles.filterRow}>
@@ -225,6 +242,22 @@ const styles = StyleSheet.create({
   },
   storiesAllText: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.primary, fontWeight: Typography.semiBold },
   storiesScroll: {},
+
+  // TUKTALK BANNER
+  tuktalkBanner: {
+    marginHorizontal: Spacing.base, marginBottom: Spacing.base,
+    backgroundColor: Colors.surface, borderRadius: Radius.xl,
+    padding: Spacing.md, flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderWidth: 1.5, borderColor: Colors.borderGold, ...Shadow.goldenSm,
+  },
+  tuktalkBannerIcon: {
+    width: 44, height: 44, borderRadius: 22,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  tuktalkBannerLogo: { fontFamily: Typography.fontFamily, fontSize: Typography.base, fontWeight: Typography.black, color: '#fff' },
+  tuktalkBannerInfo: { flex: 1 },
+  tuktalkBannerTitle: { fontFamily: Typography.fontFamily, fontSize: Typography.base, fontWeight: Typography.bold, color: Colors.textPrimary, textAlign: 'right' },
+  tuktalkBannerSub: { fontFamily: Typography.fontFamily, fontSize: Typography.xs, color: Colors.textTertiary, textAlign: 'right' },
 
   // FILTER TABS
   filterRow: {
