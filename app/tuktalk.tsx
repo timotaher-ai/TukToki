@@ -606,7 +606,7 @@ export default function TukTalkScreen() {
                 <PostCard
                   post={item.data as any}
                   onLike={() => handleLike(item.data.id)}
-                  onComment={() => showAlert('التعليقات', 'سيتم فتح التعليقات قريباً')}
+                  onComment={() => router.push(`/post-detail?postId=${item.data.id}` as any)}
                   onShare={() => showAlert('مشاركة', 'تم نسخ رابط المنشور!')}
                 />
               </View>
