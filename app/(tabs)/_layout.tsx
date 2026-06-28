@@ -53,7 +53,7 @@ function CenterTabIcon({ focused }: { focused: boolean }) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-  const { unreadNotifications } = useApp();
+  const _app = useApp(); // reserved for future badge use
 
   const tabBarStyle = {
     height: Platform.select({ ios: insets.bottom + 66, android: insets.bottom + 66, default: 70 }),
@@ -98,16 +98,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="family"
         options={{
-          title: 'الرحلات',
+          title: 'رحلاتي',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="history" focused={focused} color={color} size={size} />
+            <TabIcon name="local-taxi" focused={focused} color={color} size={size} />
           ),
         }}
       />
       <Tabs.Screen
         name="social"
         options={{
-          title: 'طلب توك توك',
+          title: 'طلب توكتك',
           tabBarLabel: () => null,
           tabBarIcon: ({ focused }) => <CenterTabIcon focused={focused} />,
         }}
@@ -115,14 +115,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="wallet"
         options={{
-          title: 'الإشعارات',
+          title: 'TukTalk',
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon
-              name="notifications-outlined"
+              name="forum"
               focused={focused}
               color={color}
               size={size}
-              badge={unreadNotifications}
             />
           ),
         }}
@@ -130,9 +129,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'الملف الشخصي',
+          title: 'بروفايلي',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="person-outline" focused={focused} color={color} size={size} />
+            <TabIcon name="person" focused={focused} color={color} size={size} />
           ),
         }}
       />
